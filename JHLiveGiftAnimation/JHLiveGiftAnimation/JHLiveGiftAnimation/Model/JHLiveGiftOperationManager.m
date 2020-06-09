@@ -82,7 +82,7 @@
             if (ws.keepPreCount) {
                 // 缓存数量
                 [ws.giftCountCache setObject:@(model.giftCount + operation.giftView.preCount) forKey:key];
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(kJHLiveGiftViewShowDuration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ws.keepTime * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     [ws.giftCountCache removeObjectForKey:key];
                 });
             }
