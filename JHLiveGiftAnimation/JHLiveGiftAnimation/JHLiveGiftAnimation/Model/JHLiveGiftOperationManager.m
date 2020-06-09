@@ -103,7 +103,7 @@
         [self.operationCache setObject:operation forKey:@(ID).stringValue];
         
         if (_compressTime) {
-            if (self.queue.operationCount > 2) {
+            if (self.queue.operationCount > _giftViewCount) {
                 [[NSNotificationCenter defaultCenter] postNotificationName:kJHLiveGiftViewTimeOutNotification object:@{@"time":@(_timeOut)}];
             }
         }
