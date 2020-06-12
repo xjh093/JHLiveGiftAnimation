@@ -21,6 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,    copy) NSString *senderName;
 /// 送礼人ID
 @property (nonatomic,  assign) NSInteger senderID;
+/// 收礼人ID
+@property (nonatomic,  assign) NSInteger receiverID;
 /// 内容
 @property (nonatomic,    copy) NSString *content;
 /// 礼物URL
