@@ -30,7 +30,11 @@ typedef void(^JHLiveGiftOperationManagerFinishBlock)(JHLiveGiftModel *model);
 
 + (instancetype)shareManager;
 
+/// 添加到队列
 - (void)addOperationWithModel:(JHLiveGiftModel *)model finish:(JHLiveGiftOperationManagerFinishBlock)finishBlock;
+
+/// 移除缓存的数量, `keepPreCount` 为 YES 时，调用有效
+- (void)removeCacheCountForModel:(JHLiveGiftModel *)model;
 
 @end
 
