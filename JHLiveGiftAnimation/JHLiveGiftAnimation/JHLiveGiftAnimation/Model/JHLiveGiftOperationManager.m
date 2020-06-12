@@ -15,12 +15,14 @@
 
 /// 缓存操作
 @property (nonatomic,  strong) NSCache *operationCache;
-/// 缓存之前的数量(3s)
+/// 缓存之前的数量
 @property (nonatomic,  strong) NSCache *giftCountCache;
 
 @end
 
 @implementation JHLiveGiftOperationManager
+
+#pragma mark - public
 
 + (instancetype)shareManager
 {
@@ -32,26 +34,21 @@
     return manager;
 }
 
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        _giftViewCount = 2;
-        _keepTime = 3.0;
-        _timeOut = 3.0;
-    }
-    return self;
-}
-
 - (void)addOperationWithModel:(JHLiveGiftModel *)model finish:(JHLiveGiftOperationManagerFinishBlock)finishBlock;
 {
-    NSInteger ID = model.senderID + model.giftID;
+    NSInteger ID = model.receiverID + model.giftID;
+
     JHLiveGiftOperation *operation = [self.operationCache objectForKey:@(ID).stringValue];
     
     // 上次的数量，默认保存3秒
     NSInteger preCount = 0;
     if (_keepPreCount) {
         preCount = [[self.giftCountCache objectForKey:@(ID).stringValue] integerValue];
+        
+        // 取消延迟移除
+        if (preCount) {
+            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(removeCacheForKey:) object:@(ID).stringValue];
+        }
     }
     
     // 在队列中
@@ -82,9 +79,9 @@
             if (ws.keepPreCount) {
                 // 缓存数量
                 [ws.giftCountCache setObject:@(model.giftCount + operation.giftView.preCount) forKey:key];
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ws.keepTime * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    [ws.giftCountCache removeObjectForKey:key];
-                });
+                
+                // 延迟移除
+                [ws performSelector:@selector(removeCacheForKey:) withObject:key afterDelay:ws.keepTime];
             }
             
             // 移除操作
@@ -108,6 +105,34 @@
             }
         }
     }
+}
+
+- (void)removeCacheCountForModel:(JHLiveGiftModel *)model
+{
+    if (!_keepPreCount) {
+        return;
+    }
+    
+    NSString *key = @(model.receiverID + model.giftID).stringValue;
+    [_giftCountCache removeObjectForKey:key];
+}
+
+#pragma mark - private
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _giftViewCount = 2;
+        _keepTime = 3.0;
+        _timeOut = 3.0;
+    }
+    return self;
+}
+
+- (void)removeCacheForKey:(NSString *)key
+{
+    [_giftCountCache removeObjectForKey:key];
 }
 
 - (NSOperationQueue *)queue{
