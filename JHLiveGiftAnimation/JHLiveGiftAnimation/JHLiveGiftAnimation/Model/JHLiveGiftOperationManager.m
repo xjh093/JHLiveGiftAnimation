@@ -36,7 +36,7 @@
 
 - (void)addOperationWithModel:(JHLiveGiftModel *)model finish:(JHLiveGiftOperationManagerFinishBlock)finishBlock;
 {
-    NSInteger ID = model.receiverID + model.giftID;
+    NSInteger ID = model.senderID + model.receiverID + model.giftID;
 
     JHLiveGiftOperation *operation = [self.operationCache objectForKey:@(ID).stringValue];
     
@@ -113,7 +113,7 @@
         return;
     }
     
-    NSString *key = @(model.receiverID + model.giftID).stringValue;
+    NSString *key = @(model.senderID + model.receiverID + model.giftID).stringValue;
     [_giftCountCache removeObjectForKey:key];
 }
 
